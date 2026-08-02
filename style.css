@@ -32,7 +32,7 @@
   .titlebar .title {
     color: #f3f2ee;
     letter-spacing: 1px;
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 700;
     text-transform: uppercase;
     display: flex;
@@ -41,7 +41,7 @@
 
   .titlebar .status {
     color: #9c9992;
-    font-size: 13px;
+    font-size: 16px;
     font-variant-numeric: tabular-nums;
   }
 
@@ -72,12 +72,12 @@
   .toolbar .left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .panel-count {
     color: #6e6b66;
-    font-size: 11px;
+    font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
 
-  .support { font-size: 11px; color: #6e6b66; text-transform: uppercase; letter-spacing: 0.5px; }
+  .support { font-size: 14px; color: #6e6b66; text-transform: uppercase; letter-spacing: 0.5px; }
   .support a {
     color: #1c1c1c;
     text-decoration: underline;
@@ -117,7 +117,7 @@
     padding: 8px 12px;
     background: #1c1c1c;
     border-bottom: 2px solid #1c1c1c;
-    font-size: 11px;
+    font-size: 14px;
     color: #f3f2ee;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -130,7 +130,7 @@
     border: none;
     color: #9c9992;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1;
     padding: 2px 6px;
   }
@@ -143,7 +143,7 @@
     color: #1c1c1c;
     border: none;
     padding: 16px 18px;
-    font-size: 22px;
+    font-size: 24px;
     line-height: 1.4;
     font-family: inherit;
     resize: none;
@@ -159,7 +159,7 @@
     border: 2px solid #1c1c1c;
     color: #1c1c1c;
     font-family: inherit;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 700;
     padding: 9px 16px;
     border-radius: 0;
@@ -196,7 +196,7 @@
     padding: 12px 16px;
     background: #1c1c1c;
     border-top: 2px solid #1c1c1c;
-    font-size: 11px;
+    font-size: 15px;
     color: #9c9992;
     gap: 12px;
     flex-wrap: wrap;
@@ -210,7 +210,7 @@
     border: 1px solid #f3f2ee;
     border-radius: 0;
     padding: 1px 5px;
-    font-size: 10px;
+    font-size: 14px;
     color: #1c1c1c;
     font-weight: 700;
   }
@@ -244,7 +244,7 @@
 
   .chooser h3 {
     color: #1c1c1c;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
     margin-bottom: 16px;
     letter-spacing: 1px;
@@ -266,7 +266,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 12px;
+    font-size: 14px;
     color: #1c1c1c;
     cursor: pointer;
     text-transform: uppercase;
@@ -279,7 +279,7 @@
 
   .chooser .cancel {
     margin-top: 16px;
-    font-size: 11px;
+    font-size: 14px;
     color: #6e6b66;
     cursor: pointer;
     background: none;
@@ -293,7 +293,7 @@
   /* Mobile */
   @media (max-width: 700px) {
     .support { display: none; }
-    textarea.notes { font-size: 18px; }
+    textarea.notes { font-size: 20px; }
     .footer .buttons { width: 100%; justify-content: space-between; }
     .btn { flex: 1; justify-content: center; font-size: 11px; padding: 11px 8px; }
   }
