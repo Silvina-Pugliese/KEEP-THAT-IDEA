@@ -295,7 +295,7 @@
 
   /* Mobile */
   @media (max-width: 700px) {
-    .support { display: none; }
+    /*.support { display: none; }*/
     textarea.notes { font-size: 20px; }
     .footer .buttons { width: 100%; justify-content: space-between; }
     .btn { flex: 1; justify-content: center; font-size: 11px; padding: 11px 8px; }
