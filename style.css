@@ -1,20 +1,23 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
   html, body {
-    height: 100%;
-    background: #f3f2ee;
-    color: #1c1c1c;
-    font-family: "SF Mono", "Fira Code", "Cascadia Code", "Consolas", "Liberation Mono", Menlo, monospace;
-    overflow: hidden;
-  }
+  height: 100%;
+  min-height: 100%;
+  background: #f3f2ee;
+  color: #1c1c1c;
+  font-family: "SF Mono", "Fira Code", "Cascadia Code", "Consolas", "Liberation Mono", Menlo, monospace;
+  overflow: hidden;
+}
 
-  .window {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    border: 2px solid #1c1c1c;
-    background: #f3f2ee;
-  }
+.window {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  border: 2px solid #1c1c1c;
+  background: #f3f2ee;
+}
 
   /* Title bar — solid black, inverted */
   .titlebar {
@@ -297,3 +300,18 @@
     .footer .buttons { width: 100%; justify-content: space-between; }
     .btn { flex: 1; justify-content: center; font-size: 11px; padding: 11px 8px; }
   }
+
+  @media (max-width: 700px) {
+  .window {
+    height: 100dvh;
+    border-width: 1px;
+  }
+
+  .panels {
+    padding: 10px;
+  }
+
+  .footer {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+}
