@@ -1,20 +1,23 @@
 (function () {
   const STORAGE_KEY = 'keep-that-idea-panels-v1';
   const LEGACY_KEY = 'think-build-notes-content';
+  const INTRO_KEY = 'keep-that-idea-seen-intro';
   const MAX_PANELS = 4;
 
   const panelsEl = document.getElementById('panels');
   const addPanelBtn = document.getElementById('addPanelBtn');
-  const panelCountEl = document.getElementById('panelCount');
+  const wordCountEl = document.getElementById('wordCount');
   const clearBtn = document.getElementById('clearBtn');
   const saveNotesBtn = document.getElementById('saveNotesBtn');
-  const datetimeEl = document.getElementById('datetime');
 
   const saveDialog = document.getElementById('saveDialog');
   const panelChecklist = document.getElementById('panelChecklist');
   const saveAsMdBtn = document.getElementById('saveAsMd');
   const saveAsHtmlBtn = document.getElementById('saveAsHtml');
   const cancelSaveBtn = document.getElementById('cancelSave');
+
+  const introDialog = document.getElementById('introDialog');
+  const closeIntroBtn = document.getElementById('closeIntro');
 
   let panels = [];
   let activePanelId = null;
@@ -39,7 +42,6 @@
         }
       } catch (e) { /* fall through */ }
     }
-    // migrate legacy single-note storage if present
     const legacy = localStorage.getItem(LEGACY_KEY);
     panels = [{ id: nextId(), content: legacy || '' }];
   }
@@ -60,15 +62,45 @@
     return isMobile ? panels.slice(0, 1) : panels;
   }
 
+  // Count real words — ignore markdown and most punctuation
+  function countWords(text) {
+    if (!text || !text.trim()) return 0;
+
+    const cleaned = text
+      // remove markdown headings
+      .replace(/^#{1,6}\s+/gm, '')
+      // remove bold / italic / code / strikethrough markers
+      .replace(/(\*\*|__|\*|_|`+|~~)/g, '')
+      // turn [text](url) into just text
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // turn most remaining punctuation into spaces (keep apostrophes & hyphens)
+      .replace(/[^\w\s'-]/g, ' ')
+      // collapse multiple spaces
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!cleaned) return 0;
+    return cleaned.split(' ').filter(Boolean).length;
+  }
+
+  function updateWordCount() {
+    const total = panels.reduce((sum, p) => sum + countWords(p.content), 0);
+    if (total === 0) {
+      wordCountEl.textContent = 'you’ve written 0 words so far';
+    } else if (total === 1) {
+      wordCountEl.textContent = 'you’ve written 1 word so far';
+    } else {
+      wordCountEl.textContent = 'you’ve written ' + total + ' words so far';
+    }
+  }
+
   function updateToolbarState() {
-    const count = panels.length;
     if (isMobile) {
       addPanelBtn.disabled = true;
-      panelCountEl.textContent = '1 panel (mobile)';
     } else {
-      addPanelBtn.disabled = count >= MAX_PANELS;
-      panelCountEl.textContent = count + ' / ' + MAX_PANELS + ' panels';
+      addPanelBtn.disabled = panels.length >= MAX_PANELS;
     }
+    updateWordCount();
   }
 
   function renderPanels() {
@@ -79,40 +111,33 @@
       wrap.className = 'panel' + (panel.id === activePanelId ? ' active' : '');
       wrap.dataset.id = panel.id;
 
-      const head = document.createElement('div');
-      head.className = 'panel-head';
-      const label = document.createElement('span');
-      label.className = 'label';
-      label.textContent = 'panel ' + (idx + 1);
-      head.appendChild(label);
-
       if (!isMobile && panels.length > 1) {
         const removeBtn = document.createElement('button');
         removeBtn.className = 'panel-remove';
         removeBtn.type = 'button';
-        removeBtn.title = 'Remove this panel';
+        removeBtn.title = 'Close this page';
         removeBtn.textContent = '✕';
         removeBtn.addEventListener('click', () => removePanel(panel.id));
-        head.appendChild(removeBtn);
+        wrap.appendChild(removeBtn);
       }
-
-      wrap.appendChild(head);
 
       const textarea = document.createElement('textarea');
       textarea.className = 'notes';
       textarea.spellcheck = false;
       textarea.value = panel.content;
+
       const placeholders = [
-        '# Every breakthrough\n\nwas once just an idea.',
-        '# Ideas get sharper\n\nthe moment they land on the page.',
-        '# The best ideas\n\ncome unexpected.',
-        '# Coming back to an old idea\n\ncan change everything.'
+        'Every breakthrough was once just an idea…',
+        'Ideas get sharper the moment they land on the page…',
+        'The best ones usually arrive when you’re not looking…',
+        'Coming back to an old thought can change everything…'
       ];
-      textarea.placeholder = placeholders[idx] || '# One more thought\n\nis one more thought closer.';
+      textarea.placeholder = placeholders[idx] || 'One more thought is one more thought closer…';
 
       textarea.addEventListener('input', () => {
         panel.content = textarea.value;
         debouncedSave();
+        updateWordCount();
       });
 
       textarea.addEventListener('focus', () => {
@@ -159,8 +184,7 @@
   clearBtn.addEventListener('click', () => {
     const panel = activePanel();
     if (!panel || panel.content.trim() === '') return;
-    const idx = panels.indexOf(panel) + 1;
-    const confirmed = confirm('Clear panel ' + idx + '? This cannot be undone.');
+    const confirmed = confirm('Clear this page? The words will be gone for good.');
     if (confirmed) {
       panel.content = '';
       savePanels();
@@ -176,7 +200,6 @@
     return simpleMarkdownToHtml(md || '');
   }
 
-  // Minimal fallback converter, used only if the CDN parser fails to load.
   function simpleMarkdownToHtml(md) {
     const escape = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const lines = escape(md).split('\n');
@@ -236,7 +259,7 @@
     if (!selectedPanels.length) return;
     if (format === 'md') {
       const content = selectedPanels.map(p => p.content || '').join('\n\n---\n\n');
-      downloadFile(content, 'notes.md', 'text/markdown;charset=utf-8');
+      downloadFile(content, 'my-writing.md', 'text/markdown;charset=utf-8');
     } else {
       const body = selectedPanels
         .map(p => markdownToHtml(p.content || ''))
@@ -246,7 +269,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>notes</title>
+<title>my writing</title>
 <style>
   body {
     margin: 0;
@@ -254,12 +277,12 @@
     max-width: 760px;
     margin-inline: auto;
     background: #ffffff;
-    color: #111111;
+    color: #2e2e2c;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     font-size: 17px;
     line-height: 1.6;
   }
-  h1, h2, h3, h4, h5, h6 { line-height: 1.25; margin: 1.4em 0 0.5em; color: #0a0a0a; }
+  h1, h2, h3, h4, h5, h6 { line-height: 1.25; margin: 1.4em 0 0.5em; color: #1a1a1a; }
   h1 { font-size: 2em; border-bottom: 1px solid #e5e5e5; padding-bottom: 0.2em; }
   p { margin: 0.8em 0; }
   ul, ol { margin: 0.8em 0; padding-left: 1.6em; }
@@ -276,15 +299,10 @@
 ${body}
 </body>
 </html>`;
-      downloadFile(html, 'notes.html', 'text/html;charset=utf-8');
+      downloadFile(html, 'my-writing.html', 'text/html;charset=utf-8');
     }
   }
 
-  saveNotesBtn.addEventListener('click', () => {
-    openSaveDialog();
-  });
-
-  // --- Save dialog ---
   function openSaveDialog() {
     panelChecklist.innerHTML = '';
     if (panels.length > 1) {
@@ -297,7 +315,7 @@ ${body}
         input.id = id;
         input.dataset.id = panel.id;
         const span = document.createElement('span');
-        span.textContent = 'panel ' + (idx + 1) + (panel.content.trim() ? '' : ' (empty)');
+        span.textContent = 'page ' + (idx + 1) + (panel.content.trim() ? '' : ' (empty)');
         label.appendChild(input);
         label.appendChild(span);
         panelChecklist.appendChild(label);
@@ -315,6 +333,19 @@ ${body}
     return panels.filter(p => ids.includes(p.id));
   }
 
+  saveNotesBtn.addEventListener('click', openSaveDialog);
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      openSaveDialog();
+    }
+    if (e.key === 'Escape') {
+      if (introDialog.classList.contains('visible')) hideIntro();
+      else hideSaveDialog();
+    }
+  });
+
   saveAsMdBtn.addEventListener('click', () => {
     performDownload('md', getSelectedPanels());
     hideSaveDialog();
@@ -326,13 +357,41 @@ ${body}
   cancelSaveBtn.addEventListener('click', hideSaveDialog);
   saveDialog.addEventListener('click', e => { if (e.target === saveDialog) hideSaveDialog(); });
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') hideSaveDialog();
-  });
-
   addPanelBtn.addEventListener('click', addPanel);
 
-  // --- Responsive mode switching ---
+  // --- Intro ---
+  function showIntro() {
+    introDialog.classList.add('visible');
+  }
+
+  function hideIntro() {
+    introDialog.classList.remove('visible');
+    try {
+      localStorage.setItem(INTRO_KEY, '1');
+    } catch (e) { /* ignore */ }
+  }
+
+  function shouldShowIntro() {
+    try {
+      return !localStorage.getItem(INTRO_KEY);
+    } catch (e) {
+      return true;
+    }
+  }
+
+  closeIntroBtn.addEventListener('click', hideIntro);
+  introDialog.addEventListener('click', e => {
+    if (e.target === introDialog) hideIntro();
+  });
+
+    // Re-open intro anytime
+  const aboutBtn = document.getElementById('aboutBtn');
+  aboutBtn.addEventListener('click', e => {
+    e.preventDefault();
+    showIntro();
+  });
+
+  // --- Responsive ---
   function applyResponsiveMode() {
     const nowMobile = detectMobile();
     if (nowMobile !== isMobile) {
@@ -342,21 +401,6 @@ ${body}
   }
   window.addEventListener('resize', applyResponsiveMode);
 
-  // --- Clock ---
-  function updateDateTime() {
-    const now = new Date();
-    const yyyy = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const dd = String(now.getDate()).padStart(2, '0');
-    const hh = String(now.getHours()).padStart(2, '0');
-    const mi = String(now.getMinutes()).padStart(2, '0');
-    const ss = String(now.getSeconds()).padStart(2, '0');
-    const tz = now.toLocaleTimeString('en-US', { timeZoneName: 'short' }).split(' ').pop();
-    datetimeEl.innerHTML = `${yyyy}-${mm}-${dd} <span class="time">${hh}:${mi}:${ss}</span> ${tz}`;
-  }
-  updateDateTime();
-  setInterval(updateDateTime, 1000);
-
   // --- Init ---
   isMobile = detectMobile();
   loadPanels();
@@ -364,4 +408,8 @@ ${body}
   renderPanels();
   const firstTextarea = panelsEl.querySelector('textarea.notes');
   if (firstTextarea) firstTextarea.focus();
+
+  if (shouldShowIntro()) {
+    setTimeout(showIntro, 80);
+  }
 })();

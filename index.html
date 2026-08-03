@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KEEP-THAT-IDEA</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='11' fill='%231c1c1c'/%3E%3C/svg%3E">
+<title>keep that idea</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='11' fill='%232e2e2c'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js" defer></script>
 </head>
@@ -12,27 +12,30 @@
 <div class="window">
 
   <div class="titlebar">
-    <div class="title"><span class="dot"></span>keep-that-idea</div>
-    <div class="status" id="datetime">loading…</div>
+    <div class="title"><span class="dot"></span>keep that idea</div>
+    <div class="status" id="wordCount">you’ve written 0 words so far</div>
   </div>
 
   <div class="toolbar">
     <div class="left">
-      <button class="btn ghost" id="addPanelBtn" type="button" title="Add another panel">＋ add panel</button>
-      <span class="panel-count" id="panelCount"></span>
+      <button class="btn ghost" id="addPanelBtn" type="button" title="Open another page">＋ another page</button>
     </div>
     <div class="support">
-      <a href="https://buymeacoffee.com/silvinapugliese" target="_blank" rel="noopener">☕ tip the maker</a>
+      <a href="https://buymeacoffee.com/silvinapugliese" target="_blank" rel="noopener">☕ buy me a coffee</a>
+      <span class="sep">·</span>
+      <a href="https://x.com/Silvina_Think" target="_blank" rel="noopener">say hello on X</a>
+      <span class="sep">·</span>
+      <a href="#" id="aboutBtn">about</a>
     </div>
   </div>
 
   <div class="panels" id="panels"></div>
 
   <div class="footer">
-    <div class="hint">All content stays in your browser. Nothing is stored or sent anywhere.</div>
+    <div class="hint">Your writing stays right here in your browser. Nothing is sent anywhere.</div>
     <div class="buttons">
-      <button class="btn danger" id="clearBtn" type="button" title="Clear the active panel">🗑 clear panel</button>
-      <button class="btn" id="saveNotesBtn" type="button" title="Choose panels and format to save">⬇ save notes</button>
+      <button class="btn danger" id="clearBtn" type="button" title="Clear this page">start over</button>
+      <button class="btn" id="saveNotesBtn" type="button" title="Save what you’ve written">save these pages</button>
     </div>
   </div>
 </div>
@@ -40,13 +43,27 @@
 <!-- Save dialog -->
 <div class="overlay" id="saveDialog">
   <div class="chooser">
-    <h3>save notes</h3>
+    <h3>save these pages</h3>
     <div class="panel-checklist" id="panelChecklist"></div>
     <div class="opts">
-      <button class="btn" id="saveAsMd">save as .md</button>
-      <button class="btn html" id="saveAsHtml">save as .html</button>
+      <button class="btn" id="saveAsMd">as markdown</button>
+      <button class="btn html" id="saveAsHtml">as a web page</button>
     </div>
-    <button class="cancel" id="cancelSave">esc / cancel</button>
+    <button class="cancel" id="cancelSave">esc</button>
+  </div>
+</div>
+
+<!-- Intro overlay -->
+<div class="overlay" id="introDialog">
+  <div class="chooser intro-card">
+    <h3>keep that idea</h3>
+    <p class="intro-text">
+      This is a simple notebook that lives only in your browser.<br><br>
+      Organise your ideas in up to 4 writing areas and save what you want as a Markdown or HTML file.<br><br>
+      No sign-in. Your writing never leaves your computer.<br><br>
+      Just you and the page.
+    </p>
+    <button class="btn" id="closeIntro">start writing</button>
   </div>
 </div>
 
